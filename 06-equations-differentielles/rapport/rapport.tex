@@ -1,0 +1,188 @@
+\documentclass{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{subcaption}
+
+%%%%%%%%%%%%%%%% Lengths %%%%%%%%%%%%%%%%
+\setlength{\textwidth}{15.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\oddsidemargin}{0.5cm}
+
+%%%%%%%%%%%%%%%% Variables %%%%%%%%%%%%%%%%
+\def\projet{6}
+\def\titre{Résolution approchée d'équations différentielles / Modélisation de systèmes dynamiques}
+\def\groupe{2}
+\def\equipe{3}
+\def\responsible{Benjamin Chew}
+\def\secretary{Solan Boher--Sanchez}
+\def\others{Alexis Gaudray Bouju, Yani Haouchine}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%% Header %%%%%%%%%%%%%%%%
+\noindent\begin{minipage}{0.98\textwidth}
+  \vskip 0mm
+  \noindent
+  { \begin{tabular}{p{7.5cm}}
+      {\bfseries \sffamily
+        Projet \projet} \\
+      {\itshape \titre}
+    \end{tabular}}
+  \hfill
+  \fbox{\begin{tabular}{l}
+      {~\hfill \bfseries \sffamily Groupe \groupe\ - Equipe \equipe \hfill~} \\[2mm]
+      Responsable : \responsible \\
+      Secrétaire : \secretary \\
+      Codeurs : \others
+    \end{tabular}}
+  \vskip 4mm ~
+
+  ~~~\parbox{0.95\textwidth}{\small \textit{Résumé~: Ce projet a pour objectif la résolution approchée d'équations différentielles àl'aide de différentes méthodes et son application à des systèmes physiques complexes. La première application est l'analyse du comportement chaotique d'un double pendule. La seconde est le système proie-prédateur de Lotka-Volterra, qui est un système modélisant l'évolution d'une population. } \sffamily
+
+  }
+  \vskip 1mm ~
+\end{minipage}
+
+%%%%%%%%%%%%%%%% Main part %%%%%%%%%%%%%%%%
+
+\section{Résolution d'équations différentielles}
+Afin de résoudre une équation différentielle, nous allons implémenter et comparer plusieurs méthodes de Runge-Kutta. Tout d'abord la méthode d'Euler puis la méthode du point milieu, celle de Heun et enfin la méthode de Runge-Kutta d'ordre 4.
+
+\subsection{Présentation des méthodes}
+Dans cette section, nous allons détailler les différentes méthodes de Runge-Kutta que nous avons implémentées.
+
+\subsubsection{Méthode d'Euler}
+La méthode d'Euler (rectangle à gauche) est la plus simple des méthodes de Runge-Kutta. On évalue la fonction à l'extrémité gauche de l'intervalle en \(x=0\)
+La formule de la méthode d'Euler est donnée par :
+\(y_{n+1} = y_n + h_n F(t_n, y_n)\)
+où \(h_n\) est le pas de temps, \(t_n\) est le temps courant et \(y_n\) est la valeur de la fonction à ce temps.
+
+\subsubsection{Méthode du point milieu}
+La méthode du point milieu est une amélioration de la méthode d'Euler. On évalue la fonction à au milieu de l'intervalle en \(x=\frac{1}{2}\)
+La formule de la méthode du point milieu est donnée par :
+\(y_{n+1} = y_n + h_n F(t_n + \frac{h_n}{2}, y_n + \frac{h_n}{2} F(t_n, y_n))\)
+
+\subsubsection{Méthode de Heun}
+La méthode de Heun est l'équivalent de la méthode du trapèze. Elle est d'ordre 2. La formule de la méthode de Heun est donnée par :
+\(y_{n+1} = y_n + \frac{h_n}{2} ( F(t_n, y_n) + F(t_n + h_n, y_n + h_n F(t_n, y_n)) )\)
+
+\subsubsection{Méthode de Runge-Kutta d'ordre 4}
+La méthode de Runge-Kutta d'ordre 4 est une méthode plus avancée d'ordre 4. Elle correspond à la méthode de Simpson. La formule de la méthode de Runge-Kutta d'ordre 4 est donnée par :
+\(y_{n+1} = y_n + \frac{h_n}{6} ( p_{n1} + 2p_{n2} + 2p_{n3} + p_{n4} )\) où :
+\(p_{n1} = F(t_n, y_n)\)
+\(p_{n2} = F(t_n + \frac{h_n}{2}, y_n + \frac{h_n}{2} p_{n1})\)
+\(p_{n3} = F(t_n + \frac{h_n}{2}, y_n + \frac{h_n}{2} p_{n2})\)
+\(p_{n4} = F(t_n + h_n, y_n + h_n p_{n3})\)
+
+\subsection{Comparaison des méthodes}
+Nous allons comparer les différentes méthodes de Runge-Kutta en traçant la solution de l'équation différentielle pour chaque méthode. Nous allons également calculer l'erreur entre la solution exacte et la solution approchée pour chaque méthode.
+
+Nous allons tester ces fonctions sur l'équation différentielle suivante dont la solution exacte est connue :
+\(y(t) = \left[ \begin{array}{c} y_1(t) \\ y_2(t) \end{array} \right]\)
+, avec :
+\(\begin{cases} y(0) = \left[ \begin{array}{c} 1 \\ 0 \end{array} \right] \\ y’(t) = \left[ \begin{array}{c} -y_2(t) \\ y_1(t) \end{array} \right] \end{cases}\)
+La solution est :
+\(y(t) = \left[ \begin{array}{c} \cos(t) \\ \sin(t) \end{array} \right] \)
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.55\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{rapport/img/champ_tangente.png}
+    \caption{Champ des tangentes.}
+    \label{fig:champ_tangente_a}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.43\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{rapport/img/comparaison_methods.png}
+    \caption{Comparaison des méthodes.}
+    \label{fig:comparaison_methods}
+  \end{subfigure}
+  \caption{Exemple sur une équation à solution connue}
+  \label{fig:champs_tangentes_comparaison}
+\end{figure}
+
+Nous observons sur le tracé des différentes méthodes de Runge-Kutta Figure~\ref{fig:comparaison_methods} que la méthode d'Euler est la moins bonne et diverge. Les autres méthodes (superposées sur le Figure~\ref{fig:comparaison_methods}) sont plus précises et convergent vers la solution exacte. Ces solutions concordent avec le champ des tangentes de la solution exacte, tracé sur la Figure~\ref{fig:champ_tangente_a}.
+
+\section{Étude du pendule à $N$ maillons}
+Nous considérons un système composé de $N$ tiges rigides, de longueur $\ell$ et de masse $m$, reliées en série et libres de se mouvoir dans un plan vertical. Chaque tige peut pivoter autour de l’extrémité de la précédente. Ce système est appelé \textit{pendule à $N$ maillons}, et son état est entièrement décrit par un vecteur d’angles :
+\[
+\boldsymbol{\theta} = (\theta_1, \theta_2, \dots, \theta_N)
+\]
+où $\theta_i$ est l’angle formé entre la tige $i$ et la verticale.
+
+\subsection{Pendule simple}
+Le pendule simple obéit à l’équation différentielle non linéaire : \(\ddot{\theta} + \frac{g}{\ell} \sin(\theta) = 0\)
+\\
+Pour de petites oscillations ($\theta \ll 1$), on peut linéariser l’équation : \(\ddot{\theta} + \frac{g}{\ell} \theta = 0\).
+\\
+Ce qui correspond à un oscillateur harmonique de fréquence : \(\omega = \sqrt{\frac{g}{\ell}}\)
+
+Dans la Figure~\ref{fig:pendulum_frequency} on observe bien que pour des petites oscillations la fréquence est égale à ${\sqrt{\frac{g}{l}}}$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.57\textwidth]{rapport/img/pendulum_frequency.png}
+  \caption{Fréquence du pendule à un unique maillon.}
+  \label{fig:pendulum_frequency}
+\end{figure}
+\subsection{Double pendule}
+Le pendule à deux maillons est un système à deux degrés de liberté. Il obéit à un système de deux équations différentielles couplées. Les équations sont non linéaires, fortement couplées et sensibles aux conditions initiales.
+La figure \ref{fig:extremity_double_pendulum} représente la trajectoire de l'extrémité du pendule pour une vitesse initiale nulle et des angles $\theta_1, \theta_2$ initiaux non nulles. Le système présente l'aspect chaotique caractéristique du double pendule.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.62\textwidth]{rapport/img/extremity_double_pendulum.png}
+  \caption{Trajectoire de l'extrémité du pendule à deux maillons.}
+  \label{fig:extremity_double_pendulum}
+\end{figure}
+\subsubsection*{Sensibilité aux conditions initiales}
+Pour illustrer le caractère chaotique on a représenté en figure \ref{fig:first_flip_time} le temps pris par le système pour un premier retournement, c'est à dire $\theta_1$ ou $\theta_2$ supérieure à un angle pi, en fonction de différents angles initiaux.
+
+On remarque que plus les angles initiaux sont simultanément proches de 0 plus le premier retournement prend du temps. Cependant, un écart important entre les 2 angles initiaux ne garantie pas un retournement rapide.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.62\textwidth]{rapport/img/first_flip_time.png}
+  \caption{Temps de premier retournement en fonction des angles initiaux.}
+  \label{fig:first_flip_time}
+\end{figure}
+
+\section*{Simulation d'un modéle proie-predateur}
+Il s'agit ici de simuler le systéme proie-prédateur, à l'aide du modéle de Lotka-Volterra :
+
+\begin{equation}
+\begin{cases}
+\displaystyle \frac{dN}{dt} = aN - bNP \\
+\displaystyle \frac{dP}{dt} = cNP - dP
+\end{cases}
+\end{equation}
+
+où :
+\begin{itemize}
+\item \( N(t) \) : population de proies au temps \( t \),
+\item \( P(t) \) : population de prédateurs au temps \( t \),
+\item \( a > 0 \) : taux de croissance des proies en l'absence de prédateurs,
+\item \( b > 0 \) : taux de mortalité des proies dû aux prédateurs,
+\item \( c > 0 \) : taux de croissance des prédateurs en fonction de la disponibilité des proies,
+\item \( d > 0 \) : taux de mortalité naturelle des prédateurs.
+\end{itemize}
+
+\subsection*{Variation au cours du temps}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{rapport/img/modéle_proie_predateur.png}
+  \caption{Évolution au cours du temps de nombres de proie et du nombre de prédateur à droite et portrait de phase à droite}
+  \label{fig:population_evolution}
+\end{figure}
+
+La figure \ref{fig:population_evolution} à été construite en choisissons a = 1.2 , b = 0.3 , c = 0.8 et d = 1.0
+Ces valeurs sont cohérentes avec un systéme ou les proies seraient des lapins et les prédateurs seraient des renards
+
+\end{document}

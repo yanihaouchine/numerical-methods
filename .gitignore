@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# LaTeX (les rapport.pdf sont versionnés volontairement)
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Sorties générées par les scripts
+*.npz
+03-svd-compression-image/partie-4/decompressed_svd.png
+
+# Éditeurs
+*~
+\#*\#
+.vscode/
+.idea/

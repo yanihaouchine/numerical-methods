@@ -1,0 +1,189 @@
+\documentclass{article}
+
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+%%%%%%%%%%%%%%%% Lengths %%%%%%%%%%%%%%%%
+\setlength{\textwidth}{15.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\oddsidemargin}{0.5cm}
+
+%%%%%%%%%%%%%%%% Variables %%%%%%%%%%%%%%%%
+\def\projet{5}
+\def\titre{Méthode d'interpolation et d'intégration}
+\def\groupe{2}
+\def\equipe{3}
+\def\responsible{Yoann Moresco}
+\def\secretary{Yani Haouchine}
+\def\others{Wissal Faouzi, Solan Boher-Sanchez}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%% Header %%%%%%%%%%%%%%%%
+\noindent\begin{minipage}{0.98\textwidth}
+  \vskip 0mm
+  \noindent
+  { \begin{tabular}{p{7.5cm}}
+      {\bfseries \sffamily
+        Projet \projet} \\ 
+      {\itshape \titre}
+    \end{tabular}}
+  \hfill 
+  \fbox{\begin{tabular}{l}
+      {~\hfill \bfseries \sffamily Groupe \groupe\ - Equipe \equipe
+        \hfill~} \\[2mm] 
+      Responsable : \responsible \\
+      Secrétaire : \secretary \\
+      Codeurs : \others
+    \end{tabular}}
+  \vskip 4mm ~
+
+  ~~~\parbox{0.95\textwidth}{\small \textit{Résumé~:} \sffamily Le présent projet a pour objectif l'obtention d'une carte de pression autour d'une aile d'avion afin de déterminer la portance de l'aile qui permet à l'avion de se maintenir en l'air. Nous allons notamment étudier le profil de ses ailes à l'aide d'une interpolation polynomiale qui utilise la méthode des splines cubiques. Les méthodes d'intégration comme celle de Simpson seront ici utilisées afin de calculer la longueur de pression qui entoure le profil de l'aile d'avion.  }
+  \vskip 1mm ~
+\end{minipage}
+
+%%%%%%%%%%%%%%%% Main part %%%%%%%%%%%%%%%%
+\section*{Recette}
+
+\section*{Méthode des splines cubiques et obtention du profil de l'aile d'avion}
+
+Nous nous intéressons ici à la méthode d'interpolation polynomiale des splines cubiques afin de déterminer le profil d'une aile d'avion.
+
+\subsection*{Principe de la méthode des splines cubiques}
+Le principe de la méthode des splines cubiques est d'obtenir une formule d'interpolation qui soit continue pour la dérivée première et pour la dérivée seconde, à la fois à l'intérieur d'un intervalle et à ses bornes.
+
+L'idée est alors de réaliser une interpolation par morceaux par des polynômes de degrés 3 pour trouver une fonction de la forme :
+
+\begin{equation}
+  \omega_i(x) = A_i(x)*y_i + B_i(x)*y_{i+1} + \frac{h_i^2}{6}(y_i^{(2)}(A_i^3(x)-A_i(x)) + y_{i+1}^{(2)}(B_i^3(x)-B_i(x)))
+\end{equation}
+
+avec :
+
+\begin{equation}
+  A_i(x) = \frac{x_{i+1}-x}{x_{i+1}-x_i}
+  \qquad
+  B_i(x) = \frac{x-x_i}{x_{i+1}-x_i}
+  \qquad
+  h_i = x_{i+1}-x_i
+\end{equation}
+
+
+\medskip
+
+Pour déterminer les dérivées secondes $y_{i}^{(2)}$ présentes dans le calcul de la fonction à interpoler, on utilise une fonction spline, qui garantit la continuité des dérivées secondes à l'intérieur de chaque intervalle.
+
+\medskip
+
+On utilise enfin une fonction splint qui permet une approximation de $\omega_i$ en x, à l'aide de l'égalité (1).
+
+\subsection*{Validation de spline sur la fonction $x^3$}
+Vérifions alors le bon fonctionnement de la fonction spline appliquée à la fonction $x^3$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\linewidth]{rapport/TestSplineX3.png}
+  \caption{Test de la fonction spline sur la fonction polynomiale $x^3$}
+  \label{fig:f1}
+\end{figure}
+
+Sur la figure ci-dessus, l'interpolation de la dérivée seconde de la fonction $x^3$ avec 1000 points coïncide avec le tracé de la dérivée seconde théorique de la fonction $x^3$, à savoir $6x$.
+On en déduit que la fonction spline implentée est correcte.
+
+\subsection*{Valeurs aux bornes de la dérivée seconde}
+Toutefois, sur le tracé précédent, on constate une zone d'oscillations des dérivées secondes aux bornes. Il est donc nécessaire de choisir judicieusement les points aux bornes afin d'assurer la continuité des dérivées secondes.
+
+Le tracé précédent implémente un spline naturel où la dérivée seconde aux bornes est imposée nulle. On peut aussi imposer des valeurs de dérivées premières aux bornes afin d'ajuster les dérivées secondes aux bornes.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\linewidth]{rapport/TestBornesX3.png}
+  \caption{Ajustement des dérivées secondes aux bornes}
+  \label{fig:f2}
+\end{figure}
+
+\medskip
+
+\subsection*{Profil de l'aile}
+
+Dans cette partie, nous appliquons le travail précédent réalisé sur les fonctions spline et splint au profil e662 d'aile d'avion de la base de données.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\linewidth]{rapport/ProfilAileAvion.png}
+  \caption{Profil de l'aile e662}
+  \label{fig:f3}
+\end{figure}
+
+Le tracé obtenu est bien en accord avec la cambrure de l'intrado et de l'extrado du profil d'aile étudié.
+
+\section*{Intégration}
+Maintenant que nous avons vu comment réaliser l'interpolation, ce qui nous permet de transformer un ensemble de points en une courbe suffisamment lisse, nous pouvons aborder l'intégration numérique. L'objectif est d'approximer la pression de part et d'autre du profil aérodynamique, ce qui nécessite de calculer les longueurs des splines précédemment présentées. Pour cela, nous devons calculer l'intégrale suivante :
+$$L([0, T]) = \int_0^T \sqrt{1 + f'(x)^2} \, dx$$
+Nous présentons ci-dessous plusieurs techniques pour calculer cette intégrale. Toutes ces techniques procèdent par trois phases : décomposition du domaine en morceaux, intégration approchée de la fonction sur chaque morceau, et sommation des résultats numériques ainsi obtenus.
+\subsection*{Première approche : Méthode des Rectangles}
+
+Commençons par la méthode des rectangles, une approche élémentaire basée sur les sommes de Cauchy‑Riemann. Appliquée à une fonction $f$ continue, elle permet le calcul approché d'intégrales en choisissant une subdivision régulière de pas $x_{i+1} - x_i = \frac{b-a}{n}$.
+
+Cette méthode peut être utilisée de trois manières :
+\begin{itemize}
+ \item Méthode des milieux : le rectangle est placé au milieu du segment $[x_i, x_{i+1}]$
+ \item Méthode gauche : le rectangle est placé sur $x_i$
+ \item Méthode droite : le rectangle est placé sur $x_{i+1}$
+\end{itemize}
+Une fois tous les rectangles positionnés, on calcule la somme de leurs aires avec la formule :
+
+$$S_n = h \times \sum_{i=0}^{n-1} f(c_i)$$
+
+avec $h = \frac{b-a}{n}$, $x_i = a + i \cdot h$, et $c_i = \frac{x_{i+1} - x_i}{2}$ pour la méthode des rectangles milieux, $c_i = x_i$ pour la méthode des rectangles gauche et $c_i = x_{i+1}$ pour la méthode des rectangles droite.
+\subsubsection*{Évaluation de l'erreur commise}
+
+Si $f'$ est bornée, alors il existe une constante $k$ telle que l'erreur commise est inférieure à $k/n$.
+\subsection*{Méthode des Trapèzes}
+La méthode des trapèzes est plus précise que celle des rectangles. Elle remplace tout arc de courbe correspondant à $[x_i, x_{i+1}]$ par le segment $[M_i M_{i+1}]$, et l'aire sous la courbe est approximée par le trapèze $x_i M_i M_{i+1} x_{i+1}$.
+
+Pour une subdivision régulière de l'intervalle $[a,b]$ en $n$ sous-intervalles, l'approximation $S$ de l'intégrale est donnée par :
+
+$$S = \frac{b-a}{n}\left(\frac{f(a) + f(b)}{2} + \sum_{i=1}^{n-1} f(x_i)\right)$$
+\subsubsection*{Évaluation de l'erreur commise}
+Pour une fonction $f$ de classe $C^2$ sur l'intervalle $[a,b]$, on a qu'il existe une constante $k$ telle que l'erreur est inférieure à $k/n²$.
+\subsection*{Méthode de Simpson}
+La méthode de Simpson est encore plus efficace : 
+$$\int_a^b f(x)\,dx = \frac{h}{3} \times \left(f(x_0) + 4\sum_{i \text{ impair}} f(x_i) + 2\sum_{i \text{ pair}} f(x_i) + f(x_n)\right)$$
+\subsubsection*{Évaluation de l'erreur commise}
+L'erreur commise est majorée par un $O(1/k⁴)$ ; elle est donc beaucoup plus précise que les autres méthodes.
+
+\subsection*{Comparaisons des méthodes d'intégrations}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{rapport/Comparaison_des_vitesses_de_convergence.png}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+Ici on observe que les observations théoriques faites plus haut sont vérifiées expérimentalement, la méthode d'intégration de Simpson est plus précise que la méthode des trapèzes et des rectangles.
+Et celle des rectangles est moins précise que celle des trapèzes.
+
+\section*{Applications}
+Il est à présent possible d'appliquer nos algorithmes pour simuler notre situation initiale, c'est-à-dire la pression de l'air autour de l'aile d'un avion.
+
+\subsection*{Calcul de la portance}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{rapport/portance.png}
+    \caption{Distribution de la portance}
+    \label{fig:enter-label}
+\end{figure}
+
+Ici on voit que le long de l'aile, la pression au niveau inférieur de l'aile « l'intrados » est plus élevée qu'au niveau supérieur de l'aile « l'extrados », une force est donc exercée du bas vers le haut, ce qui explique l'avion décolle. 
+
+
+\end{document}
+
+\end{document}
